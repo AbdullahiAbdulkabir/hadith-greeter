@@ -1,0 +1,13 @@
+{
+    "manifest_version": 3,
+    "name": "Hadith Greeter",
+    "version": "1.0",
+    "description": "Greets you with As-Salamu Alaykum and a daily Hadith.",
+    "permissions": ["storage", "https://www.habibur.com/"],
+    "chrome_url_overrides": {
+        "newtab": "index.html"
+    },
+    "icons": {
+        "48": "icon.ico"
+    }
+}
