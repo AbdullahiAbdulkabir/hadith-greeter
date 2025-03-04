@@ -30,6 +30,30 @@ async function fetchRandomNatureImage() {
     }
 }
 
+async function fetchDailyMessage() {
+    try {
+        const random = Math.random() < 0.5; // 50% chance for Quran or Hadith
+        if (random) {
+            const response = await fetch("https://api.alquran.cloud/v1/ayah/random");
+            const data = await response.json();
+            return `Quran: ${data.data.text} (${data.data.surah.englishName} - Ayah ${data.data.numberInSurah})`;
+        } else {
+            const hadithResponse = await fetch("https://api.sunnah.com/v1/collections/bukhari/books/1/hadiths", {
+                headers: { "X-API-Key": "YOUR_API_KEY" }
+            });
+            if (!hadithResponse.ok) {
+                return "Hadith: Indeed, actions are judged by intentions."; // Fallback Hadith
+            }
+            const hadithData = await hadithResponse.json();
+            const randomIndex = Math.floor(Math.random() * hadithData.hadiths.length);
+            return `Hadith: ${hadithData.hadiths[randomIndex]?.body || "Unable to fetch Hadith"}`;
+        }
+    } catch (error) {
+        console.error("Error fetching daily message:", error);
+        return "Hadith: Indeed, actions are judged by intentions."; // Fallback Hadith
+    }
+}
+
 
 chrome.storage.sync.get("name", async (data) => {
     if (!data.name) {
@@ -45,9 +69,10 @@ async function showGreeting(name) {
     const today = new Date().getDate() % hadiths.length;
     const imageUrl = await fetchRandomNatureImage();
     const islamicDate = await fetchIslamicDate();
+    const dailyMessage = await fetchDailyMessage();
 
     document.body.style.backgroundImage = `url(${imageUrl})`;
     document.getElementById("date").textContent = islamicDate;
     document.getElementById("greeting").textContent = `As-Salamu Alaykum, ${name}`;
-    document.getElementById("hadith").textContent = hadiths[today];
+   document.getElementById("hadith").textContent = dailyMessage;
 }
